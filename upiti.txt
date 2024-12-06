@@ -1,0 +1,48 @@
+
+--Ispis svih jela koja imaju cijenu manju od 15 eura.
+SELECT * FROM dishes WHERE price < 15;
+
+--Ispis svih narudžbi iz 2023. godine koje imaju ukupnu vrijednost veću od 50 eura.
+SELECT * FROM orders WHERE price > 50;
+
+--Ispis svih dostavljača s više od 100 uspješno izvršenih dostava do danas.
+SELECT DeliveryMan.Id, Persons.Name, COUNT(DeliveryMan.Id)
+	FROM DeliveryMan
+	JOIN DeliveryOrders ON DeliveryMan.Id = DeliveryOrders.DeliveryManId
+	JOIN Persons ON DeliveryMan.Id = Persons.Id
+	GROUP BY DeliveryMan.Id, Persons.Name
+	HAVING COUNT(DeliveryMan.Id) > 1;
+
+--Ispis svih kuhara koji rade u restoranima u Zagrebu
+SELECT Cook.Id, Persons.name, Restaurants.Name, Cities.name FROM Cook 
+	JOIN Restaurants on Cook.RestaurantsId = Restaurants.Id
+	JOIN Cities on Restaurants.CityId = Cities.Id
+	JOIN Persons on Cook.Id = Persons.Id
+	WHERE Cities.name = 'Zagreb';
+
+--Ispis broja narudžbi za svaki restoran u Splitu
+SELECT Restaurants.Name, COUNT(Orders.Id)
+	FROM Restaurants 
+	JOIN Orders ON Restaurants.Id = Orders.RestaurantsId
+	JOIN Cities ON Restaurants.cityid = Cities.Id
+	WHERE Cities.name = 'Split'
+	GROUP BY Restaurants.Name
+
+--Ispis svih jela u kategoriji "Deserti" koja su naručena više od 10 puta
+SELECT Dishes.Name, Category.CategoryName FROM Dishes
+	JOIN OrderDishes ON Dishes.Id = OrderDishes.DishesId
+	JOIN Category ON Dishes.CategoryId = Category.Id
+	GROUP BY Dishes.Id,Category.Id
+	HAVING COUNT(Dishes.Id) > 2 AND Category.CategoryName = 'dessert';
+
+--Ispis broja narudžbi korisnika s prezimenom koje počinje na "M"
+SELECT COUNT(Orders.Id) FROM DeliveryOrders
+	JOIN Orders ON DeliveryOrders.OrderId = Orders.Id
+	JOIN Customers ON Orders.CustomersId = Customers.Id
+	JOIN Persons ON Customers.Id = Persons.Id
+	WHERE Persons.Surname LIKE 'M%';
+
+
+--Ispis svih restorana koji imaju kapacitet veći od 30 stolova
+SELECT Restaurants.Name From Restaurants
+	WHERE Restaurants.Capacity > 30;

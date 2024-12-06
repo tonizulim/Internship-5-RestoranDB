@@ -1,0 +1,98 @@
+CREATE TABLE Cities (
+	Id SERIAL PRIMARY KEY,
+	Name VARCHAR(30) NOT NULL
+);
+
+CREATE TABLE Restaurants (
+	Id SERIAL PRIMARY KEY,
+	Name VARCHAR(30) NOT NULL,
+	Capacity INT NOT NULL,
+	CityId INT REFERENCES Cities(Id),
+	StartTime TIME NOT NULL,
+	EndTime TIME NOT NULL
+);
+
+CREATE TABLE Category(
+	Id SERIAL PRIMARY KEY,
+	CategoryName Varchar(50) NOT NULL
+);
+
+CREATE TABLE Dishes (
+	Id SERIAL PRIMARY KEY,
+	Name VARCHAR(50) NOT NULL,
+	Price INT NOT NULL,
+	calories INT NOT NULL,
+	Available BOOL NOT NULL,
+	RestaurantsId INT REFERENCES Restaurants(Id)
+);
+
+ALTER TABLE Dishes
+	ADD COLUMN CategoryId INT REFERENCES Category(Id);
+
+CREATE TABLE Persons (
+	Id SERIAL PRIMARY KEY,
+	Name VARCHAR(20) NOT NULL,
+	Surname VARCHAR(20) NOT NULL,
+	Adress VARCHAR(50) NOT NULL,
+	DateOfBirth DATE NOT NULL
+);
+
+CREATE TABLE Customers (
+	Id INT PRIMARY KEY,
+	LoyaltyCard BOOL NOT NULL,
+	FOREIGN KEY (Id) REFERENCES Persons(Id)
+);
+
+CREATE TABLE Cook (
+	Id INT PRIMARY KEY,
+	FOREIGN KEY (Id) REFERENCES Persons(Id),
+	RestaurantsId INT REFERENCES Restaurants(Id)
+);
+
+CREATE TABLE Waiter (
+	Id INT PRIMARY KEY,
+	FOREIGN KEY (Id) REFERENCES Persons(Id),
+	RestaurantsId INT REFERENCES Restaurants(Id)
+);
+
+CREATE TABLE DeliveryMan (
+	Id INT PRIMARY KEY,
+	DriversLicence BOOL NOT NULL,
+	FOREIGN KEY (Id) REFERENCES Persons(Id),
+	RestaurantsId INT REFERENCES Restaurants(Id)
+);
+
+CREATE TABLE Orders(
+	Id SERIAL PRIMARY KEY,
+	Price INT,
+	RestaurantsId INT REFERENCES Restaurants(Id),
+	CustomersId INT REFERENCES Customers(Id),
+	DeliveryAdress VARCHAR(50) 
+);
+
+ALTER TABLE Orders 
+	ADD COLUMN Delivery BOOLEAN DEFAULT FALSE;
+
+CREATE TABLE DeliveryOrders(
+	OrderId INT PRIMARY KEY,
+    TimeOfDelivery TIME NOT NULL,
+	DeliveryManId INT REFERENCES DeliveryMan(Id),
+    NoteForDelivery VARCHAR(100),
+    FOREIGN KEY (OrderId) REFERENCES Orders(Id)
+);
+
+
+
+CREATE TABLE OrderDishes(
+	OrderId INT REFERENCES Orders(Id),
+	DishesId INT REFERENCES Dishes(Id),
+	PRIMARY KEY (DishesId, OrderId),
+	Amount INT NOT NULL CHECK (Amount > 0)
+);
+
+CREATE TABLE OrderComments(
+	Id SERIAL PRIMARY KEY,
+	Text VARCHAR(100) NOT NULL,
+	OrderId INT REFERENCES Orders(Id),
+	Grade INT NOT NULL
+);
